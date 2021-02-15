@@ -1,8 +1,9 @@
 import cv2
 import requests
 import io
+import json
 
-img = cv2.imread("test.jpg")
+img = cv2.imread("text.jpg")
 height , width , channel = img.shape
 
 # Cutting image
@@ -13,10 +14,16 @@ url_api = "https://api.ocr.space/parse/image"
 channel,compressedimage = cv2.imencode(".jpg" , roi , [1,90])
 file_bytes = io.BytesIO(compressedimage)
 
-result = requests.post(url_api,files = {"test.jpg":file_bytes},
-              data = {"apikey":"helloworld"})
+result = requests.post(url_api,files = {"text.jpg":file_bytes},
+              data = {"apikey":"helloworld",
+                      "language": "chs"},)
 
-print(result.content.decode())
+#print(result.content.decode())
+result = result.content.decode()
+result = json.loads(result)
+
+text_detected = result.get("ParsedResults")[0].get("ParsedText")
+print(text_detected)
 
 cv2.imshow("Roi",roi)
 cv2.imshow("Img",img)
